@@ -35,7 +35,16 @@ class TyperClass(Frame):
         self.parent.title(typer_title)
         self.pack(fill=BOTH, expand=1)
 
-        self.background = typerconf.readline()
+        #back = typerconf.next()
+        #t = ""
+        #for x in range(7):
+        #    t += back[x]
+
+        #self.background = t
+
+        back = typerconf.readline()
+        back = back.rstrip('\n')
+        self.background = back
 
         menubar = Menu(self.parent)
         self.parent.config(menu=menubar)
@@ -47,18 +56,18 @@ class TyperClass(Frame):
         fileMenu.add_command(label="Print", command=self.onPrint, accelerator="Command+P")
         menubar.add_cascade(label="File", menu=fileMenu)
 
-        fileMenu2 = Menu(menubar)
-        fileMenu2.add_command(label="Quit", command=self.onQuit, accelerator="Command+w")
-        fileMenu2.add_command(label="Copy Path of File", command=self.onCopyPath, accelerator="Command+Shift+p")
-        fileMenu2.add_command(label="Toggle Fullscreen", command=self.onToggleFullScreen, accelerator="Command+Shift+f")
-        menubar.add_cascade(label="System", menu=fileMenu2)
+        system = Menu(menubar)
+        system.add_command(label="Quit", command=self.onQuit, accelerator="Command+w")
+        system.add_command(label="Copy Path of File", command=self.onCopyPath, accelerator="Command+Shift+p")
+        system.add_command(label="Toggle Fullscreen", command=self.onToggleFullScreen, accelerator="Command+Shift+f")
+        menubar.add_cascade(label="System", menu=system)
 
-        fileMenu3 = Menu(menubar)
-        fileMenu3.add_command(label="Select All", command=self.onSelectAll, accelerator="Command+a")
-        fileMenu3.add_command(label="Cut", command=self.onCut, accelerator="Command+x")
-        fileMenu3.add_command(label="Copy", command=self.onCopy, accelerator="Command+c")
-        fileMenu3.add_command(label="Paste", command=self.onPaste, accelerator="Command+v")
-        menubar.add_cascade(label="Edit", menu=fileMenu3)
+        edit = Menu(menubar)
+        edit.add_command(label="Select All", command=self.onSelectAll, accelerator="Command+a")
+        edit.add_command(label="Cut", command=self.onCut, accelerator="Command+x")
+        edit.add_command(label="Copy", command=self.onCopy, accelerator="Command+c")
+        edit.add_command(label="Paste", command=self.onPaste, accelerator="Command+v")
+        menubar.add_cascade(label="Edit", menu=edit)
 
         infoMenu = Menu(menubar)
         infoMenu.add_command(label="Show Info", command=self.onShowInfo, accelerator="Command+Option+I")
@@ -75,6 +84,12 @@ class TyperClass(Frame):
         run.add_command(label="Run Python File", command=self.runPython, accelerator="Command+Option+P")
         run.add_command(label="Run Java File", command=self.runJava, accelerator="Command+Option+J")
         menubar.add_cascade(label="Run", menu=run)
+
+        doc = Menu(menubar)
+        doc.add_command(label="Font", command=self.onFont)
+        doc.add_command(label="Font Size", command=self.onFontSize)
+        doc.add_command(label="Font Color", command=self.onFontColor)
+        menubar.add_cascade(label="Document", menu=doc)
 
         self.menu = Menu(self.parent, tearoff=0)
         self.menu.add_command(label="Cut", command=self.onCut)
@@ -106,6 +121,15 @@ class TyperClass(Frame):
         self.txt.config(bg=self.background, highlightthickness=0)
 
         scrollbar.config(command=self.txt.yview)
+
+    def onFont(self):
+        mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
+
+    def onFontSize(self):
+        mbox.showinfo("Not Implemented", "Unfortunately Typer does not currently support this function.")
+
+    def onFontColor(self):
+        mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
 
     def onLicense(self):
         l = self.readFile('LICENSE.txt')
@@ -191,7 +215,7 @@ class TyperClass(Frame):
                                     "\n\nAdded typer.conf File to store defaults\n\nAdded a menu to view Typer Source Code"
                                     "\n\nAdded scrollbar along right side\n\nAdded Save option to update current file"
                                     "\n\nAdded a semi-functional fullscreen option\n\nAdded a way to open and run Java files"
-                                    "\n\nAdded a way to open and run Python files")
+                                    "\n\nAdded a way to open and run Python files\n\nWindow now centered upon opening")
 
     def onBackground(self):
         (rgb, hx) = tkColorChooser.askcolor()
@@ -202,16 +226,19 @@ class TyperClass(Frame):
                 conflist[0] = hx
                 subprocess.call(['rm', 'typer.conf'])
                 subprocess.call(['touch', 'typer.conf'])
-                newfile = open('typer.conf', 'a')
+                newfile = open('typer.conf', 'w')
                 for x in conflist:
-                    newfile.write(x)
+                    newfile.write(x + "\n")
 
                 mbox.showinfo("Saved", str(hx) + " has been saved as your default background!")
 
     def onShowInfo(self):
-        mbox.showinfo("Typer Info", "Version: 0.0.1 Pre-Alpha \n\nLast Update: July 30 2016 \n\nDeveloped by Zach Purcell\n\n\nPrevious Version: N/A\n\n\nLicense: MIT License, see Info > License")
+        mbox.showinfo("Typer Info", "Version: 0.0.1 Pre-Alpha \n\nLast Update: July 31 2016 \n\nDeveloped by Zach Purcell\n\nPrevious Version: N/A\n\nLicense: MIT License, see Info > License")
 
     def onPrint(self):
+        mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
+        """ this will be worked on soon enough
+
         if self.file_opened:
             subprocess.call("lpr", self.current_file.name)
         else:
@@ -221,6 +248,7 @@ class TyperClass(Frame):
             elif result == "yes":
                 self.onSaveAs()
                 subprocess.call("lp", self.current_file.name)
+        """
 
     def onCopyPath(self):#currently not working
         mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
@@ -254,7 +282,7 @@ class TyperClass(Frame):
     def onOpen(self):
         temp = self.txt.get("1.0", 'end-1c')
         if temp == "":
-            ftypes = [('Python files', '*.py'), ('Text files', '*.txt'), ('Rich text files', '.rtf'), ('Java files', '*.java')]
+            ftypes = [('Python files', '*.py'), ('Text files', '*.txt'), ('Rich text files', '.rtf'), ('Java files', '*.java'), ('Conf files', '*.conf')]
             dlg = tkFileDialog.Open(self, filetypes = ftypes)
             fl = dlg.show()
             self.setTitle(fl)
@@ -332,5 +360,6 @@ if __name__ == '__main__':
     root.title(typer_title)
     ex = TyperClass(root)
     WIDTH, HEIGHT = root.winfo_screenwidth(), root.winfo_screenheight()
-    root.geometry("1200x850+0+0")
+    x, y = WIDTH/4, HEIGHT/4
+    root.geometry("800x450+" + str(x) + "+" + str(y))
     root.mainloop()
