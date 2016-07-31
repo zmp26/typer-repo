@@ -1,5 +1,4 @@
 # typer-repo
-Typer Rep
 I am aiming to make Typer a open-source, free to use, and editable text editor. It is currently in development and is written
 and tested for Apple Mac computers. Although any Unix system should be similar, I have not tested it on one yet. Eventually I
 will make a Windows version, as it should only be a few small changes (thanks python!).
@@ -12,7 +11,7 @@ within the application itself.
 
 KNOWN BUGS:
 Fullscreening (on a mac) allows for the window to be dragged around the screen but keep its size. This is an issue (obviously), as
-  we would prefer it to be immoblie. Have not found much in terms of making the window stay put, but looking into the issue.
+  we would prefer it to be immoblie. Have not found much in terms of making the window stay put, but looking into the issue. Also first time fullscreen is toggled it does not engage and window changes size. The window changing size is hardcoded in but the fact that it doesn't work first time but does every time after is an issue I will be working on.
 
 
 
