@@ -5,7 +5,7 @@ and tested for Apple Mac computers. Although any Unix system should be similar, 
 will make a Windows version, as it should only be a few small changes (thanks python!).
 
 Once you obtain typer.py and typer.conf they must be in the same directory (as of now) in order to work. This is because typer.conf
-stores default settings for Typer that allows it to not have to be reset each time.
+stores default settings for Typer that allows it to not have to be reset each time. Eventually I am going to add in a method that checks if the config file is there and creates a default one if not, which will allow for only typer.py to be needed at first. Eventually going to do something like py2app to make Typer an application as opposed to just a python file.
 
 Typer is also going to eventually be a simple programming tool, as it already includes a way to run Python and Java files from
 within the application itself.
