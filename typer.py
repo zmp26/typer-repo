@@ -64,6 +64,7 @@ class TyperClass(Frame):
         infoMenu.add_command(label="Show Info", command=self.onShowInfo, accelerator="Command+Option+I")
         infoMenu.add_command(label="What's new?", command=self.onWhatsNew, accelerator="Command+Option+N")
         infoMenu.add_command(label="Open Source Code", command=self.onOpenSourceCode)
+        infoMenu.add_command(label="License", command=self.onLicense)
         menubar.add_cascade(label="Info", menu=infoMenu)
 
         personalize = Menu(menubar)
@@ -106,6 +107,9 @@ class TyperClass(Frame):
 
         scrollbar.config(command=self.txt.yview)
 
+    def onLicense(self):
+        l = self.readFile('LICENSE.txt')
+        mbox.showinfo("License", l)
 
     def runPython(self):
         if self.file_opened:
@@ -171,8 +175,9 @@ class TyperClass(Frame):
             text = self.readFile('typer.py')
             self.txt.insert(END, text)
             self.file_opened = True
+            self.current_file = 'typer.py'
         else:
-            result = mbox.askquestion("Warning", "Opening the Typer source code will clear currently entered text. Are you sure you want to open the Typer source code?")
+            result = mbox.askquestion("Warning", "Opening the Typer source code will clear currently entered and unsaved text. Are you sure you want to open the Typer source code?")
             if result == 'yes':
                 self.txt.delete("1.0", END)
                 self.setTitle('Typer Source Code')
@@ -204,7 +209,7 @@ class TyperClass(Frame):
                 mbox.showinfo("Saved", str(hx) + " has been saved as your default background!")
 
     def onShowInfo(self):
-        mbox.showinfo("Typer Info", "Version: 0.0.1 Pre-Alpha \nLast Update: July 30 2016 \nDeveloped by Zach Purcell\n\n\nPrevious Version: N/A")
+        mbox.showinfo("Typer Info", "Version: 0.0.1 Pre-Alpha \n\nLast Update: July 30 2016 \n\nDeveloped by Zach Purcell\n\n\nPrevious Version: N/A\n\n\nLicense: MIT License, see Info > License")
 
     def onPrint(self):
         if self.file_opened:
