@@ -14,8 +14,7 @@ Fullscreening (on a mac) allows for the window to be dragged around the screen b
   we would prefer it to be immoblie. Have not found much in terms of making the window stay put, but looking into the issue. Also first time fullscreen is toggled it does not engage and window changes size. The window changing size is hardcoded in but the fact that it doesn't work first time but does every time after is an issue I will be working on.
 
 TROUBLE PRINTING?
-If you are having trouble printing please verify that you have a default printer selected. Go to System Preferences > Printers & Scanners
-  > right click preferred printer and select set as default
+If you are having trouble printing please verify that you have a default printer selected. Go to System Preferences -> Printers & Scanners -> right click preferred printer and select set as default
 Try printing again! Make sure that if it is a network printer that you are on the proper network, and if it is local make sure it is plugged into your computer!
 
 LICENSE:
