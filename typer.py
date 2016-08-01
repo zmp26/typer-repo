@@ -123,6 +123,8 @@ class TyperClass(Frame):
         self.bind_all("<Command-Option-n>", lambda event: self.after(100, self.onWhatsNew))
         self.bind_all("<Command-Option-p>", lambda event: self.after(100, self.runPython))
         self.bind_all("<Command-Option-j>", lambda event: self.after(100, self.runJava))
+        #adding an option to press escape when in fullscreen to go back to normal view
+        self.bind_all("<Escape>", lambda event: self.after(100, self.escape))
         #this is where the right click is bound
         self.parent.bind("<Button-2>", self.showMenu)
 
@@ -140,6 +142,11 @@ class TyperClass(Frame):
         """""""""""""""""
         BEGIN METHODS NOW
         """""""""""""""""
+    def escape(self):
+        if self.is_fullscreen:
+            self.is_fullscreen = False
+            unfullscreen(self.parent)
+
     #not yet working
     def onFont(self):
         mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
@@ -234,7 +241,8 @@ class TyperClass(Frame):
                                     "\n\nAdded typer.conf File to store defaults\n\nAdded a menu to view Typer Source Code"
                                     "\n\nAdded scrollbar along right side\n\nAdded Save option to update current file"
                                     "\n\nAdded a semi-functional fullscreen option\n\nAdded a way to open and run Java files"
-                                    "\n\nAdded a way to open and run Python files\n\nWindow now centered upon opening")
+                                    "\n\nAdded a way to open and run Python files\n\nWindow now centered upon opening"
+                                    "\n\nAdded printing to default printer")
 
     def onBackground(self): #allows for the user to pick a background and possibly save it as their default background
         (rgb, hx) = tkColorChooser.askcolor() #built in color chooser from tkinter returns a tuple with rgb value and hex value
@@ -254,20 +262,14 @@ class TyperClass(Frame):
     def onShowInfo(self): #simple method to showinfo about current version of Typer and some basic info about Typer
         mbox.showinfo("Typer Info", "Version: 0.0.1 Pre-Alpha \n\nLast Update: July 31 2016 \n\nDeveloped by Zach Purcell\n\nPrevious Version: N/A\n\nLicense: MIT License, see Info > License")
 
-    def onPrint(self): #Still working on this, want to use terminal to print by using lp or lpr command, but can't seem to get it to work. Will work on this
-        mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
-        """ this will be worked on soon enough
-
-        if self.file_opened:
-            subprocess.call("lpr", self.current_file.name)
-        else:
-            result = mbox.askquestion("Error", "In order to print the file must be saved. Would you like to save now?")
-            if result == "no":
-                pass
-            elif result == "yes":
-                self.onSaveAs()
-                subprocess.call("lp", self.current_file.name)
-        """
+    def onPrint(self): #THIS METHOD WILL ONLY WORK IF YOU HAVE A DEFAULT PRINTER - IT PRINTS TO DEFAULT PRINTER
+        text = self.txt.get("1.0", END)
+        subprocess.call(['touch', 'tempfile.txt'])
+        tempfile = open('tempfile.txt', 'r+')
+        tempfile.write(text)
+        subprocess.call(['lpr', 'tempfile.txt'])
+        mbox.showinfo("Printing To Default Printer", "Printing to your default printer.")
+        tempfile.close()
 
     def onCopyPath(self): #copies the current opened file path to clipboard
         if self.file_opened: #checks if a file is opened
