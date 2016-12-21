@@ -3,20 +3,79 @@ import tkFileDialog             #allows for file open, save
 import tkMessageBox as mbox     #tkMessageBox is a message box (mbox) from tkinter (warning, question, error, info)
 import subprocess               #Trying to use subprocess.call(cmd) to pass a print (lp or lpr) command to print document...harder than it sounds apparently
 import tkColorChooser           #importing this for choosing background of text widget (self.txt)
-
-
+import os
+import tkFont
 
 #global variable for title of program
-typer_title = "Typer 0.0.1 Pre-Alpha"
+typer_title = "Typer 0.1.0 Alpha"
+
+#global variable for conf file error
+conf_file_error = False
+
+font_list = ['Cooper', 'Courier', 'Didot', 'Helvetica', 'Serif', 'Times', 'Verdana']
+
+def check_typer_conf():
+    #since typer.py is in same directory as typer.conf, we can just do a simple check here
+    if os.path.exists('typer.conf') == True: #changing this to inclued another if statement to check each line in typer.conf and make sure it is an accepted value
+        templist = open('typer.conf', 'r+').readlines()
+        if check_if_hex(templist[0].rstrip('\n')):
+            a = True
+        else:
+            make_typer_conf()
+            return False
+        if check_if_accepted_font(templist[0].rstrip('\n')):
+            b = True
+        else:
+            make_typer_conf()
+            return False
+        if check_if_int(int(templist[0].rstrip('\n'))):
+            c = True
+        else:
+            make_typer_conf()
+            return False
+        if a and b and c:
+            return True
+    else:
+        #here we need to recreate a basic typer.conf as it appears typer.conf has been moved, deleted, or has become corrupt
+        make_typer_conf()
+        #for now, all we have in conf are these lines in make_typer_conf
+        return False
+
+def make_typer_conf():
+    subprocess.call(['rm', 'typer.conf'])
+    subprocess.call(['touch', 'typer.conf'])
+    tempfile = open('typer.conf', 'r+')
+    tempfile.write('#ffffff\n')
+    tempfile.write('Arial\n')
+    tempfile.write('16\n')
+    tempfile.close()
+
+def check_if_hex(hex):
+    hex_digits = set("0123456789abcdef")
+    for char in hex:
+        if not (char in hex_digits):
+            return False
+    return True
+
+def check_if_accepted_font(font_name):
+    return font_name in font_list
+
+
+def check_if_int(size):
+    return isinstance(size, int)
+
+conf_file_error = check_typer_conf()
 
 #opening the Typer configuration file
 typerconf = open('typer.conf', 'r+')
 conflist = open('typer.conf').readlines()
 
-#creating the class
+
+#creating the typer class
 class TyperClass(Frame):
 
     def __init__(self, parent):
+
         Frame.__init__(self, parent)
         self.parent = parent
         self.TyperSetup()
@@ -51,6 +110,9 @@ class TyperClass(Frame):
         menubar = Menu(self.parent)
         self.parent.config(menu=menubar)
 
+        #creating the fontsize variable
+        self.font_size = conflist[2]
+        self.font_val = conflist[1]
         #this is the File menu, holds open, save as, save, print, and file commands
         fileMenu = Menu(menubar)
         fileMenu.add_command(label="Open", command=self.onOpen, accelerator="Command+o")
@@ -83,9 +145,9 @@ class TyperClass(Frame):
         menubar.add_cascade(label="Info", menu=infoMenu)
 
         #this is the personalize menu, holds background...will hold other defaults that user can choose in future
-        personalize = Menu(menubar)
-        personalize.add_command(label="Background", command=self.onBackground, accelerator="Command+Shift+B")
-        menubar.add_cascade(label="Personalize", menu=personalize)
+        preferences = Menu(menubar)
+        preferences.add_command(label="Background", command=self.onBackground, accelerator="Command+Shift+B")
+        menubar.add_cascade(label="Preferences", menu=preferences)
 
         #this is the run menu, holds options to run python and java files. Will add more options in the future
         run = Menu(menubar)
@@ -96,8 +158,6 @@ class TyperClass(Frame):
         #this is the document menu, holds font, font size, and font color choices. Not yet implemented fully
         doc = Menu(menubar)
         doc.add_command(label="Font", command=self.onFont)
-        doc.add_command(label="Font Size", command=self.onFontSize)
-        doc.add_command(label="Font Color", command=self.onFontColor)
         menubar.add_cascade(label="Document", menu=doc)
 
         #here we set up the right click options so you can right click to cut, copy, and paste
@@ -132,13 +192,18 @@ class TyperClass(Frame):
         scrollbar = Scrollbar(self)
         scrollbar.pack(side=RIGHT, fill=Y)
 
+        txtfont = tkFont.Font(family=self.font_val, size=self.font_size)
+
         self.txt = Text(self, yscrollcommand=scrollbar.set)
+        self.txt.configure(font=txtfont)
         self.txt.pack(fill=BOTH, expand=1)
         #making the highlightthickness of the text widget be width of 0 so there is no border when selected
         #this makes the scroll bar look much better
         self.txt.config(bg=self.background, highlightthickness=0)
         #allow you to click and drag the scrollbar to move instead of using mouse scroll only
         scrollbar.config(command=self.txt.yview)
+        #check below if there was a conf file error, if so notify the user
+
         """""""""""""""""
         BEGIN METHODS NOW
         """""""""""""""""
@@ -149,13 +214,60 @@ class TyperClass(Frame):
 
     #not yet working
     def onFont(self):
-        mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
-    #not yet working
-    def onFontSize(self):
-        mbox.showinfo("Not Implemented", "Unfortunately Typer does not currently support this function.")
-    #not yet working
-    def onFontColor(self):
-        mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
+        #mbox.showinfo("Not Implemented", "Unfotunately Typer does not currently support this function.")
+
+
+        fontlist = ['Cooper', 'Courier', 'Didot', 'Helvetica', 'Serif', 'Times', 'Verdana']
+
+        self.top = Toplevel()
+        self.top.title('Font Options')
+
+        self.font_listbox = Listbox(self.top)
+        self.font_listbox.pack(side=LEFT)
+
+        self.font_size_listbox = Listbox(self.top)
+        self.font_size_listbox.pack(side=RIGHT)
+
+        self.font_listbox.bind("<Button-1>", lambda event: self.after(100, self.Font))
+        self.font_size_listbox.bind("<Button-1>", lambda event: self.after(100, self.FontSize))
+
+        self.confirmBtn = Button(self.top, text='Confirm', command=self.onConfirm)
+        self.saveBtn = Button(self.top, text='Save as Default', command=self.onSaveAsDefault)
+
+        self.confirmBtn.pack()
+        self.saveBtn.pack()
+
+        for f in fontlist:
+            self.font_listbox.insert(END, f)
+
+        for x in range(1,75):
+            self.font_size_listbox.insert(END, x)
+
+
+    def onConfirm(self):
+        cust_font = tkFont.Font(family=self.font_val, size=self.font_size)
+        self.txt.configure(font=cust_font)
+        self.top.destroy()
+
+    def onSaveAsDefault(self):
+        result = mbox.askquestion('Save as Default?', 'Save ' + self.font_val + ' ' + str(self.font_size) + ' px as default?')
+        if result == 'yes':
+            conflist[1] = self.font_val
+            conflist[2] = self.font_size
+            subprocess.call(['rm', 'typer.conf'])
+            subprocess.call(['touch', 'typer.conf'])
+            newfile = open('typer.conf', 'w')
+            for x in conflist:
+                newfile.write(str(x).rstrip('\n') + '\n')
+        else:
+            pass
+
+    def Font(self):
+        self.font_val = self.font_listbox.get(self.font_listbox.curselection()[0])
+
+    def FontSize(self):
+        self.font_size = self.font_size_listbox.get(self.font_size_listbox.curselection()[0])
+
     #shows the license in popup box
     def onLicense(self):
         #reading in the license text file
@@ -237,12 +349,7 @@ class TyperClass(Frame):
                 self.current_file = "typer.py"
 
     def onWhatsNew(self): #a method to have a showinfo box explain changes from last version to current version. This should be updated anytime something is added.
-        mbox.showinfo("What's New", "Added Background Color Chooser\n\nAdded What's New menu"
-                                    "\n\nAdded typer.conf File to store defaults\n\nAdded a menu to view Typer Source Code"
-                                    "\n\nAdded scrollbar along right side\n\nAdded Save option to update current file"
-                                    "\n\nAdded a semi-functional fullscreen option\n\nAdded a way to open and run Java files"
-                                    "\n\nAdded a way to open and run Python files\n\nWindow now centered upon opening"
-                                    "\n\nAdded printing to default printer")
+        mbox.showinfo("What's New in " + typer_title, "Typer now lets you set default font type and font size. \nTyper verifies that typer.conf is in the proper format, and if not fixes it.")
 
     def onBackground(self): #allows for the user to pick a background and possibly save it as their default background
         (rgb, hx) = tkColorChooser.askcolor() #built in color chooser from tkinter returns a tuple with rgb value and hex value
@@ -251,16 +358,24 @@ class TyperClass(Frame):
             result = mbox.askquestion("Set as default?", "Would you like to set " + str(hx) + " as default background?") #asking to save as default
             if result == 'yes':
                 conflist[0] = hx #conflist is a list of all lines on typer.conf, conflist[0] is first line, which is where background hex color is stored. If they want to update the default color, this gets changed to the hex they just chose
+                conflist[0].rstrip('\n')
                 subprocess.call(['rm', 'typer.conf']) #much like our save command, this removes/deletes typer.conf
                 subprocess.call(['touch', 'typer.conf']) #and then re adds it
                 newfile = open('typer.conf', 'w') #and opens the new typer.conf
-                for x in conflist: #and rewrites it exactly as it was, with the exception of the first line hex value changing
-                    newfile.write(x + "\n")
 
+                for x in conflist: #and rewrites it exactly as it was, with the exception of the first line hex value changing
+                    newfile.write(x.rstrip('\n') + '\n')
+
+                '''
+                #rewriting the for loop above into 3 calls to get rid of weird spacing issues with the loop and typer.conf
+                newfile.write(conflist[0].rstrip('\n') + '\n')
+                newfile.write(conflist[1].rstrip('\n') + '\n')
+                newfile.write(conflist[2].rstrip('\n') + '\n')
+                '''
                 mbox.showinfo("Saved", str(hx) + " has been saved as your default background!") #alerts the user that the color has been successfully changed/updated
 
     def onShowInfo(self): #simple method to showinfo about current version of Typer and some basic info about Typer
-        mbox.showinfo("Typer Info", "Version: 0.0.1 Pre-Alpha \n\nLast Update: July 31 2016 \n\nDeveloped by Zach Purcell\n\nPrevious Version: N/A\n\nLicense: MIT License, see Info > License")
+        mbox.showinfo("Typer Info", "Version: 0.1.0 Alpha \n\nLast Update: December 21 2016 \n\nDeveloped by Zach Purcell\n\nPrevious Version: 0.0.2 Pre-Alpha\n\nLicense: MIT License, see Info > License for more information")
 
     def onPrint(self): #THIS METHOD WILL ONLY WORK IF YOU HAVE A DEFAULT PRINTER - IT PRINTS TO DEFAULT PRINTER
         text = self.txt.get("1.0", END)
@@ -393,6 +508,7 @@ def unfullscreen(Frame): #method to change size of window to normal
     root.overrideredirect(1)
     root.geometry("800x450+" + str(x) + "+" + str(y))
     """
+
 
 if __name__ == '__main__': #start the program here
     root = Tk() #root = Tk() allows a window to be made
